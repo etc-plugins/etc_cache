@@ -1,0 +1,11 @@
+{
+  "name": "etc_cache",
+  "description": "Events-driven cache solution for Textoattern CMS.",
+  "version": "0.2.6-beta",
+  "type": 5,
+  "author": "Oleg Loukianov",
+  "author_uri": "http://www.iut-fbleau.fr/projet/etc/",
+  "order": 5,
+  "flags": 2,
+  "help": {"file" : ["./README.textile"]}
+}
