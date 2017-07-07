@@ -89,10 +89,10 @@ function etc_cache($atts, $thing = null)
     static $lastmod = null, $times = array();
 
     extract(lAtts(array(
-        'id' => !empty($atts['form']) ? $atts['form'] : null,
-        'form' => '',
+        'id'    => !empty($atts['form']) ? $atts['form'] : null,
+        'form'  => '',
         'reset' => null,
-        'time' => true
+        'time'  => true
     ), $atts));
 
     if (empty($id)) {
@@ -317,7 +317,85 @@ if (0) {
 ?>
 <!--
 # --- BEGIN PLUGIN HELP ---
-<p><a href="http://www.iut-fbleau.fr/projet/etc/index.php?id=52">Homepage</a></p>
+h1. etc_cache
+
+"Download":https://github.com/etc-plugins/etc_cache/releases | "Packagist":https://packagist.org/packages/etc-plugins/etc_cache
+
+This Textpattern plugin provides an events-driven cache solution for Textpattern CMS.
+
+Textpattern is fast, but when you have thousands of articles, processing the whole list (say, for creating a sitemap) can become time consuming. It's a good idea (unless you publish an article every minute) to cache the processed result. Naturally, the cached block must be updated when content/an article is added/deleted. Most caching plugins trigger this update when the corresponding page is visited after the site update - this has, however, two inconveniences:
+
+# The first visitor has to wait while the expired block is processed and cached again
+# Every site modification, even irrelevant to the cached content, yields the cache update
+
+That’s what etc_cache is aimed to solve.
+
+h2. Installing
+
+Using "Composer":https://getcomposer.org:
+
+bc. $ composer require etc-plugins/etc_cache:*
+
+Or download the latest version of the plugin from "the GitHub project page":https://github.com/etc-plugins/etc_cache/releases, paste the code into the Textpattern Plugins administration panel, install and enable the plugin. Visit the "forum thread":https://forum.textpattern.io/viewtopic.php?id=47702 for more info or to report on the success or otherwise of the plugin.
+
+h2. Requirements
+
+* Textpattern 4.6.0 or newer.
+
+h2. Tags
+
+The basic usage is:
+
+bc. <txp:etc_cache id="heavycode">
+    ...heavy...
+</txp:etc_cache>
+
+h4. Attributes
+
+* @id="id name"@<br />A unique identifier name for this cached item.
+* @reset="value"@<br />See reset information below.
+* @time="value"@<br />See time information below.
+
+The code will be processed and cached until the site is updated. On site update, the plugin (if configured so) will ping the URL containing this block, triggering the cache refresh. Hence, the cache will always stay up to date, without penalizing site visitors.
+
+To configure automatic cache updates, visit Extensions region Cache administration panel and edit reset field of each block. The possible values are:
+
+* (empty): update client-side only when expired, regardless the site updates
+* @1@: (default) update client-side if expired or the site was updated
+* a list of events like @article_posted, article_saved@ or @SQL LIKE@ pattern like @article%@: update server-side when a matching event is fired.
+
+The value @%@ thus means 'auto-update on each site update', but will act as @1@ client-side too.
+
+You can be more specific with cache reset criteria. Say, if you need a block to be reset only if the article 3 is updated, set:
+
+bc. reset: article_saved
+filter: {"article_saved":{"ID":3}}
+
+You can also pass a @reset@ attribute directly to etc_cache:
+
+bc. <txp:etc_cache id="archive" reset="article%">
+    ...heavy code building an articles archive...
+</txp:etc_cache>
+
+If needed, one can pass a @time@ attribute to etc_cache:
+
+bc. <txp:etc_cache id="dailycode" time="+1 day">
+    ...daily code...
+</txp:etc_cache>
+
+A positive (relative) value of time will indicate that the cache (even a fresh one) must be reset on site update.
+
+An absolute value like @time='<txp:modified format="%F %T" gmt="1" /> +1 month'@ will mean 'cache it if not modified since one month'.
+
+A negative value will not observe site updates, for example (@-900@ seconds is equiavlent to 15 minutes):
+
+<txp:etc_cache id="api-feed" time="-900">
+    ...feed code...
+</txp:etc_cache>
+
+h2. Authors/credits
+
+Written by "Oleg Loukianov":http://www.iut-fbleau.fr/projet/etc/. Many thanks to "all additional contributors":https://github.com/etc-plugins/etc_cache/graphs/contributors.
 # --- END PLUGIN HELP ---
 -->
 <?php
