@@ -1,7 +1,7 @@
 {
   "name": "etc-plugins/etc_cache",
   "description": "Events-driven cache solution for Textoattern CMS.",
-  "keywords": ["textpattern", "plugin", "cache", "cacheing", "performance"],
+  "keywords": ["textpattern", "plugin", "cache", "caching", "performance"],
   "homepage": "https://github.com/etc-plugins/etc_cache",
   "license": "GPL-2.0",
   "type": "textpattern-plugin",
