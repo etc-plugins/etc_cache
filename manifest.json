@@ -1,6 +1,6 @@
 {
   "name": "etc_cache",
-  "description": "Events-driven cache solution for Textoattern CMS.",
+  "description": "Events-driven cache solution for Textpattern CMS.",
   "version": "0.2.6-beta",
   "type": 5,
   "author": "Oleg Loukianov",
