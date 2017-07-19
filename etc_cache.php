@@ -253,9 +253,33 @@ public function tab($event, $step) {
 	$rs = safe_rows('id, time, url, reset, filter, IF(LENGTH(text)>512, CONCAT(LEFT(text, 504), " ..."), text) AS text', 'etc_cache', '1 ORDER BY time DESC');
 	$now = date_create('now');
 
-	pagetop("etc_cache", "<strong>Cache</strong> settings");
-	echo '<h2>Cached items ('.$prefs['lastmod'].')</h2>'.n;
-	echo '<table><thead><tr><th>'.dLink('etc_cache', 'save', 'save', 'Delete').'</th><th>id</th><th>time</th><th>url</th><th>reset</th><th>filter</th><th></th></tr></thead><tbody>';
+	pagetop("etc_cache");
+
+    echo n.'<div class="txp-layout">'.
+        n.tag(
+            hed('Cached items', 1, array('class' => 'txp-heading')).
+            graf('('.$prefs['lastmod'].')', array('class' => 'information')),
+            'div', array('class' => 'txp-layout-1col')
+        );
+
+	echo n.tag_start('div', array(
+            'class' => 'txp-layout-1col',
+            'id'    => $event.'_container',
+        )).
+        n.tag_start('div', array('class' => 'txp-listtables')).
+        n.tag_start('table', array('class' => 'txp-list--no-options')).
+        n.tag_start('thead').
+        tr(
+            n.'<th>'.dLink('etc_cache', 'save', 'save', 'Delete').'</th>'.
+            n.'<th>ID</th>'.
+            n.'<th>'.gTxt('time').'</th>'.
+            n.'<th>URL</th>'.
+            n.'<th>'.gTxt('reset').'</th>'.
+            n.'<th>Filter</th>'.
+            n.'<th>Actions</th>'
+        ).
+        n.tag_end('thead').
+        n.tag_start('tbody');
 
 	foreach($rs as $row) {
 		extract($row);
@@ -265,24 +289,31 @@ public function tab($event, $step) {
 		$days = $diff->format('%d');
 		$diff = (!$days ? '' : "$days day".($days == 1 ? '' : 's'). ' ').$diff->format('%H:%I hours old');
 
-		echo '<form method="post" action="?event=etc_cache"><tr>'.n;
-		echo '<td>'.tag(
-            span(gTxt('delete'), array('class' => 'ui-icon ui-icon-close')),
-            'button',
-            array(
-                'name'      => 'save',
-                'value'      => 'Delete',
-                'class'      => 'destroy',
-                'type'       => 'submit',
-                'title'      => gTxt('delete'),
-                'aria-label' => gTxt('delete'),
-            ))."</td><td title='".doSpecial($text)."'>".doSpecial($id)."</td><td class='$class' title='$diff'>".doSpecial($time)."</td><td>".fInput('text', 'url', $url)."</td><td>".fInput('text', 'reset', $reset)."</td><td>".fInput('text', 'filter', $filter)."</td>";
-		echo '<td class="onhover">', fInput('submit', 'save', gTxt('update')), fInput('submit', 'save', gTxt('save'), 'publish'), '</td>';
+		echo '<form method="post" action="?event=etc_cache">'.n.'<tr>';
+		echo n.'<td>'.
+            n.tag(
+                span(gTxt('delete'), array('class' => 'ui-icon ui-icon-close')),
+                'button',
+                array(
+                    'name'      => 'save',
+                    'value'      => 'Delete',
+                    'class'      => 'destroy',
+                    'type'       => 'submit',
+                    'title'      => gTxt('delete'),
+                    'aria-label' => gTxt('delete'),
+                )
+            )."</td><td title='".doSpecial($text)."'>".doSpecial($id)."</td><td class='$class' title='$diff'>".doSpecial($time)."</td><td>".fInput('text', 'url', $url)."</td><td>".fInput('text', 'reset', $reset)."</td><td>".fInput('text', 'filter', $filter)."</td>";
+		echo '<td>', fInput('submit', 'save', gTxt('update')), fInput('submit', 'save', gTxt('save')), '</td>';
 		echo sInput('save'), hInput('id', $id), tInput();
-		echo '</tr></form>';
+		echo n.'</tr>'.n.'</form>';
 	}
 
-	echo '</tbody></table>';
+    echo n.tag_end('tbody').
+        n.tag_end('table').
+        n.tag_end('div');
+
+    echo n.tag_end('div'). // End of .txp-layout-1col.
+        n.'</div>'; // End of .txp-layout.
 }
 //------- end class
 }
