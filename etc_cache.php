@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_cache';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.2.6-beta';
+$plugin['version'] = '0.2.6-beta2';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Events-driven cache';
@@ -54,17 +54,14 @@ $plugin['flags'] = '2';
 // #@language ISO-LANGUAGE-CODE
 // abc_string_name => Localized String
 
-/** Uncomment me, if you need a textpack
-$plugin['textpack'] = <<< EOT
-#@admin
-#@language en-gb
-abc_sample_string => Sample String
-abc_one_more => One more
-#@language de-de
-abc_sample_string => Beispieltext
-abc_one_more => Noch einer
+$plugin['textpack'] = <<<EOT
+#@etc_cache
+etc_cache_tab => Cache
+etc_cache_heading => Cached items
+etc_cache_cached_at => Cached at
+etc_cache_filter => Filter
 EOT;
-**/
+
 // End of textpack
 
 if (!defined('txpinterface'))
@@ -169,7 +166,7 @@ class etc_Cache
 public function __construct()
 {
 	add_privs('etc_cache', '1,2');
-	register_tab('extensions', 'etc_cache', 'Cache');
+	register_tab('extensions', 'etc_cache', gTxt('etc_cache_tab'));
 	register_callback(array($this, 'update'), 'site.update');
 	register_callback(array($this, 'tab'), 'etc_cache');
 }
@@ -257,8 +254,7 @@ public function tab($event, $step) {
 
     echo n.'<div class="txp-layout">'.
         n.tag(
-            hed('Cached items', 1, array('class' => 'txp-heading')).
-            graf('('.$prefs['lastmod'].')', array('class' => 'information')),
+            hed(gTxt('etc_cache_heading'), 1, array('class' => 'txp-heading')),
             'div', array('class' => 'txp-layout-1col')
         );
 
@@ -270,12 +266,12 @@ public function tab($event, $step) {
         n.tag_start('table', array('class' => 'txp-list--no-options')).
         n.tag_start('thead').
         tr(
-            n.'<th>'.dLink('etc_cache', 'save', 'save', 'Delete').'</th>'.
+            n.'<th>'.dLink('etc_cache', 'save', 'save', 'Delete').n.'</th>'.
             n.'<th>ID</th>'.
-            n.'<th>'.gTxt('time').'</th>'.
+            n.'<th>'.gTxt('etc_cache_cached_at').'</th>'.
             n.'<th>URL</th>'.
             n.'<th>'.gTxt('reset').'</th>'.
-            n.'<th>Filter</th>'.
+            n.'<th>'.gTxt('etc_cache_filter').'</th>'.
             n.'<th>Actions</th>'
         ).
         n.tag_end('thead').
@@ -289,8 +285,9 @@ public function tab($event, $step) {
 		$days = $diff->format('%d');
 		$diff = (!$days ? '' : "$days day".($days == 1 ? '' : 's'). ' ').$diff->format('%H:%I hours old');
 
-		echo '<form method="post" action="?event=etc_cache">'.n.'<tr>';
-		echo n.'<td>'.
+		echo n.'<form method="post" action="?event=etc_cache">'.
+            n.'<tr>'.
+		    n.'<td>'.
             n.tag(
                 span(gTxt('delete'), array('class' => 'ui-icon ui-icon-close')),
                 'button',
@@ -302,10 +299,17 @@ public function tab($event, $step) {
                     'title'      => gTxt('delete'),
                     'aria-label' => gTxt('delete'),
                 )
-            )."</td><td title='".doSpecial($text)."'>".doSpecial($id)."</td><td class='$class' title='$diff'>".doSpecial($time)."</td><td>".fInput('text', 'url', $url)."</td><td>".fInput('text', 'reset', $reset)."</td><td>".fInput('text', 'filter', $filter)."</td>";
-		echo '<td>', fInput('submit', 'save', gTxt('update')), fInput('submit', 'save', gTxt('save')), '</td>';
-		echo sInput('save'), hInput('id', $id), tInput();
-		echo n.'</tr>'.n.'</form>';
+            ).'</td>'.
+            n.'<td title="'.doSpecial($text).'">'.doSpecial($id).'</td>'.
+            n.'<td class="'.$class.'">'.doSpecial($time).' ('.$diff.')</td>'.
+            n.'<td>'.fInput('text', 'url', $url, '', '', '', INPUT_REGULAR).n.'</td>'.
+            n.'<td>'.fInput('text', 'reset', $reset, '', '', '', INPUT_REGULAR).n.'</td>'.
+            n.'<td>'.fInput('text', 'filter', $filter, '', '', '', INPUT_REGULAR).n.'</td>'.
+		    n.'<td>'.fInput('submit', 'save', gTxt('update')).fInput('submit', 'save', gTxt('save')).n.'</td>'.
+		    sInput('save').
+            hInput('id', $id).
+            tInput().
+		    n.'</tr>'.n.'</form>';
 	}
 
     echo n.tag_end('tbody').
