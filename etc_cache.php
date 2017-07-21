@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_cache';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.2.6-beta2';
+$plugin['version'] = '0.2.6';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Events-driven cache';
@@ -56,10 +56,11 @@ $plugin['flags'] = '2';
 
 $plugin['textpack'] = <<<EOT
 #@etc_cache
-etc_cache_tab => Cache
-etc_cache_heading => Cached items
 etc_cache_cached_at => Cached at
 etc_cache_filter => Filter
+etc_cache_heading => Cached items
+etc_cache_no_cached_items => No cached items recorded.
+etc_cache_tab => Cache
 EOT;
 
 // End of textpack
@@ -261,60 +262,69 @@ public function tab($event, $step) {
 	echo n.tag_start('div', array(
             'class' => 'txp-layout-1col',
             'id'    => $event.'_container',
-        )).
-        n.tag_start('div', array('class' => 'txp-listtables')).
-        n.tag_start('table', array('class' => 'txp-list--no-options')).
-        n.tag_start('thead').
-        tr(
-            n.'<th>'.dLink('etc_cache', 'save', 'save', 'Delete').n.'</th>'.
-            n.'<th>ID</th>'.
-            n.'<th>'.gTxt('etc_cache_cached_at').'</th>'.
-            n.'<th>URL</th>'.
-            n.'<th>'.gTxt('reset').'</th>'.
-            n.'<th>'.gTxt('etc_cache_filter').'</th>'.
-            n.'<th>Actions</th>'
-        ).
-        n.tag_end('thead').
-        n.tag_start('tbody');
+        ));
 
-	foreach($rs as $row) {
-		extract($row);
-		$class = 'date'.($reset == '%' && $time < $prefs['lastmod'] ? ' warning' : '');
-		$datetime = date_create($time);
-		$diff = $datetime->diff($now);
-		$days = $diff->format('%d');
-		$diff = (!$days ? '' : "$days day".($days == 1 ? '' : 's'). ' ').$diff->format('%H:%I hours old');
+    if ($rs) {
+        echo n.tag_start('div', array('class' => 'txp-listtables')).
+            n.tag_start('table', array('class' => 'txp-list--no-options')).
+            n.tag_start('thead').
+            tr(
+                n.'<th>'.dLink('etc_cache', 'save', 'save', 'Delete').n.'</th>'.
+                n.'<th>ID</th>'.
+                n.'<th>'.gTxt('etc_cache_cached_at').'</th>'.
+                n.'<th>URL</th>'.
+                n.'<th>'.gTxt('reset').'</th>'.
+                n.'<th>'.gTxt('etc_cache_filter').'</th>'.
+                n.'<th>Actions</th>'
+            ).
+            n.tag_end('thead').
+            n.tag_start('tbody');
 
-		echo n.'<form method="post" action="?event=etc_cache">'.
-            n.'<tr>'.
-		    n.'<td>'.
-            n.tag(
-                span(gTxt('delete'), array('class' => 'ui-icon ui-icon-close')),
-                'button',
-                array(
-                    'name'      => 'save',
-                    'value'      => 'Delete',
-                    'class'      => 'destroy',
-                    'type'       => 'submit',
-                    'title'      => gTxt('delete'),
-                    'aria-label' => gTxt('delete'),
-                )
-            ).'</td>'.
-            n.'<td title="'.doSpecial($text).'">'.doSpecial($id).'</td>'.
-            n.'<td class="'.$class.'">'.doSpecial($time).' ('.$diff.')</td>'.
-            n.'<td>'.fInput('text', 'url', $url, '', '', '', INPUT_REGULAR).n.'</td>'.
-            n.'<td>'.fInput('text', 'reset', $reset, '', '', '', INPUT_REGULAR).n.'</td>'.
-            n.'<td>'.fInput('text', 'filter', $filter, '', '', '', INPUT_REGULAR).n.'</td>'.
-		    n.'<td>'.fInput('submit', 'save', gTxt('update')).fInput('submit', 'save', gTxt('save')).n.'</td>'.
-		    sInput('save').
-            hInput('id', $id).
-            tInput().
-		    n.'</tr>'.n.'</form>';
-	}
+    	foreach($rs as $row) {
+    		extract($row);
+    		$class = 'date'.($reset == '%' && $time < $prefs['lastmod'] ? ' warning' : '');
+    		$datetime = date_create($time);
+    		$diff = $datetime->diff($now);
+    		$days = $diff->format('%d');
+    		$diff = (!$days ? '' : "$days day".($days == 1 ? '' : 's'). ' ').$diff->format('%H:%I hours old');
 
-    echo n.tag_end('tbody').
-        n.tag_end('table').
-        n.tag_end('div');
+    		echo n.'<form method="post" action="?event=etc_cache">'.
+                n.'<tr>'.
+    		    n.'<td>'.
+                n.tag(
+                    span(gTxt('delete'), array('class' => 'ui-icon ui-icon-close')),
+                    'button',
+                    array(
+                        'name'      => 'save',
+                        'value'      => 'Delete',
+                        'class'      => 'destroy',
+                        'type'       => 'submit',
+                        'title'      => gTxt('delete'),
+                        'aria-label' => gTxt('delete'),
+                    )
+                ).'</td>'.
+                n.'<td title="'.doSpecial($text).'">'.doSpecial($id).'</td>'.
+                n.'<td class="'.$class.'">'.doSpecial($time).' <small>('.$diff.')</small></td>'.
+                n.'<td>'.fInput('text', 'url', $url, '', '', '', INPUT_MEDIUM).n.'</td>'.
+                n.'<td>'.fInput('text', 'reset', $reset, '', '', '', INPUT_MEDIUM).n.'</td>'.
+                n.'<td>'.fInput('text', 'filter', $filter, '', '', '', INPUT_MEDIUM).n.'</td>'.
+    		    n.'<td>'.fInput('submit', 'save', gTxt('update')).fInput('submit', 'save', gTxt('save')).n.'</td>'.
+    		    sInput('save').
+                hInput('id', $id).
+                tInput().
+    		    n.'</tr>'.n.'</form>';
+    	}
+
+        echo n.tag_end('tbody').
+            n.tag_end('table').
+            n.tag_end('div');
+    } else {
+        echo graf(
+            span(null, array('class' => 'ui-icon ui-icon-info')).' '.
+            gTxt('etc_cache_no_cached_items'),
+            array('class' => 'alert-block information')
+        );
+    }
 
     echo n.tag_end('div'). // End of .txp-layout-1col.
         n.'</div>'; // End of .txp-layout.
