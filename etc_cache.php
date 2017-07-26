@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_cache';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.2.6';
+$plugin['version'] = '0.2.7';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Events-driven cache';
@@ -56,10 +56,12 @@ $plugin['flags'] = '2';
 
 $plugin['textpack'] = <<<EOT
 #@etc_cache
+etc_cache_actions => Actions
 etc_cache_cached_at => Cached at
 etc_cache_filter => Filter
 etc_cache_heading => Cached items
 etc_cache_no_cached_items => No cached items recorded.
+etc_cache_reset => Reset
 etc_cache_tab => Cache
 EOT;
 
@@ -273,9 +275,9 @@ public function tab($event, $step) {
                 n.'<th>ID</th>'.
                 n.'<th>'.gTxt('etc_cache_cached_at').'</th>'.
                 n.'<th>URL</th>'.
-                n.'<th>'.gTxt('reset').'</th>'.
+                n.'<th>'.gTxt('etc_cache_reset').'</th>'.
                 n.'<th>'.gTxt('etc_cache_filter').'</th>'.
-                n.'<th>Actions</th>'
+                n.'<th>'.gTxt('etc_cache_actions').'</th>'
             ).
             n.tag_end('thead').
             n.tag_start('tbody');
