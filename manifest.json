@@ -2,6 +2,7 @@
   "name": "etc_cache",
   "description": "Events-driven cache solution for Textpattern CMS.",
   "version": "0.2.7",
+  "txp-type":"textpattern-plugin",
   "type": 5,
   "author": "Oleg Loukianov",
   "author_uri": "http://www.iut-fbleau.fr/projet/etc/",
