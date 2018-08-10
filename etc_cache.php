@@ -287,7 +287,7 @@ public function tab($event, $step) {
     		$class = 'date'.($reset == '%' && $time < $prefs['lastmod'] ? ' warning' : '');
     		$datetime = date_create($time);
     		$diff = $datetime->diff($now);
-    		$days = $diff->format('%d');
+    		$days = $diff->format('%a');
     		$diff = (!$days ? '' : "$days day".($days == 1 ? '' : 's'). ' ').$diff->format('%H:%I hours old');
 
     		echo n.'<form method="post" action="?event=etc_cache">'.
