@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_cache';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.2.7';
+$plugin['version'] = '0.2.8';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Events-driven cache';
