@@ -19,7 +19,7 @@ $plugin['name'] = 'etc_cache';
 
 $plugin['version'] = '0.2.8';
 $plugin['author'] = 'Oleg Loukianov';
-$plugin['author_uri'] = 'www.iut-fbleau.fr/projet/etc/';
+$plugin['author_uri'] = 'http://www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Events-driven cache';
 
 // Plugin load order:
