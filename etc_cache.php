@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_cache';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.2.8';
+$plugin['version'] = '0.3';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'http://www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Events-driven cache';
@@ -90,6 +90,7 @@ function etc_cache($atts, $thing = null)
 
     extract(lAtts(array(
         'id'    => !empty($atts['form']) ? $atts['form'] : null,
+        'url'   => '',
         'form'  => '',
         'reset' => null,
         'time'  => true
@@ -147,7 +148,8 @@ function etc_cache($atts, $thing = null)
     $parse = !$cached || $update < 0 || $cached['time'] < $update;
 
     if ($parse) {
-        $out = $form ? parse_form($form, $thing) : parse($thing);
+        $out = $url ? file_get_contents($url) : false;
+        $out !== false or $out = $form ? parse_form($form, $thing) : parse((string)$thing);
 
         if ($update >= 0) {
             $renew = ($reset || !isset($cached['url']) ? "url='".doSlash($pretext['req'])."'," : '')
@@ -168,10 +170,20 @@ class etc_Cache
 {
 public function __construct()
 {
+    if (txpinterface === 'admin') {
 	add_privs('etc_cache', '1,2');
 	register_tab('extensions', 'etc_cache', gTxt('etc_cache_tab'));
 	register_callback(array($this, 'update'), 'site.update');
 	register_callback(array($this, 'tab'), 'etc_cache');
+    }
+}
+
+public function match($value, array $values) {
+    if ($values) foreach((array)$values as $v) {
+        if (preg_match('/^'.str_replace('%', '.*', preg_quote($v, '/')).'$/', $value)) return true;
+    }
+
+    return false;
 }
 
 public function update($event, $step = '', $rs = null)
@@ -186,7 +198,7 @@ public function update($event, $step = '', $rs = null)
 
             if (isset($items[$step]) && is_array($items[$step])) {
                 foreach ($items[$step] as $field => $value) {
-                    if (isset($rs[$field]) && !in_array($rs[$field], (array)$value)) {
+                    if (isset($rs[$field]) && !$this->match($rs[$field], (array)$value)) {
                         continue 2;
                     }
                 }
@@ -241,7 +253,7 @@ public function tab($event, $step) {
 			filter='".doSlash(gps('filter'))."'",
 			"id=$qid");
 		break;
-		case gTxt('delete') : safe_delete('etc_cache', $id ? "id=$qid" : '1');
+		case 'Delete' : safe_delete('etc_cache', $id ? "id=$qid" : '1');
 		break;
 		case gTxt('update') : safe_update('etc_cache', 'time=NULL', $id ? "id=$qid" : '1');
 		if ($id && $url = safe_field('url', 'etc_cache', "id=$qid")) {
